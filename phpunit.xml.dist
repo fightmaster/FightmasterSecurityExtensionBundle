@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ This file is part of the Fightmaster/security-extension library.
+
+ (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
+
+ This source file is subject to the MIT license that is bundled
+ with this source code in the file LICENSE.
+-->
+
+<phpunit bootstrap="./tests/bootstrap.php" color="true">
+    <testsuites>
+        <testsuite name="security-extension">
+            <directory suffix="Test.php">./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>./</directory>
+            <exclude>
+                <directory>./tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
