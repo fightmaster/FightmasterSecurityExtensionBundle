@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Fightmaster/security-extension library.
+ * This file is part of the FightmasterSecurityExtensionBundle package.
  *
  * (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  *
@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Fightmaster\Security\Handler;
+namespace Fightmaster\SecurityExtensionBundle\Security\Handler;
 
 /**
  * Used for checking if the ACL system will allow specific actions  to occur.
@@ -30,6 +30,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function canView($object);
@@ -39,6 +40,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function canEdit($object);
@@ -48,6 +50,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function canDelete($object);
@@ -57,6 +60,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function canUndelete($object);
@@ -66,6 +70,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function isOperator($object);
@@ -76,6 +81,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function isMaster($object);
@@ -86,6 +92,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function isOwner($object);
@@ -98,6 +105,7 @@ interface HandlerInterface
      *
      * @param $object
      * @return void
+     * @throws Exception\ObjectClassNameNotFoundException
      * @throws Exception\InvalidArgumentException
      */
     public function setDefaultAcl($object);
@@ -107,7 +115,7 @@ interface HandlerInterface
      *
      * @return void
      */
-    public function installFallbackAcl($roleInformation = array());
+    public function installFallbackAcl();
 
     /**
      * Removes default Acl entries

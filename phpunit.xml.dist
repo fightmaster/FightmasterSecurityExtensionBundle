@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- This file is part of the Fightmaster/security-extension library.
+ This file is part of the FightmasterSecurityExtensionBundle package.
 
  (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
 
@@ -9,10 +9,10 @@
  with this source code in the file LICENSE.
 -->
 
-<phpunit bootstrap="./tests/bootstrap.php" color="true">
+<phpunit bootstrap="./Tests/bootstrap.php" color="true">
     <testsuites>
-        <testsuite name="security-extension">
-            <directory suffix="Test.php">./tests</directory>
+        <testsuite name="FightmasterSecurityExtensionBundle">
+            <directory suffix="Test.php">./Tests</directory>
         </testsuite>
     </testsuites>
 
@@ -20,7 +20,8 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./tests</directory>
+                <directory>./Resources</directory>
+                <directory>./Tests</directory>
             </exclude>
         </whitelist>
     </filter>

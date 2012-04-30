@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Fightmaster/security-extension library.
+ * This file is part of the FightmasterSecurityExtensionBundle package.
  *
  * (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  *
@@ -9,11 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Fightmaster\Security\Handler\Exception;
+namespace Fightmaster\SecurityExtensionBundle\Security\Exception;
 
 /**
  * @author Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  */
-class ObjectClassNameNotFoundException extends \LogicException implements Exception
+class InvalidArgumentException extends \InvalidArgumentException implements Exception
 {
 }

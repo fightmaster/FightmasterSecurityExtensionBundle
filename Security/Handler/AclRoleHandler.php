@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Fightmaster/security-extension library.
+ * This file is part of the FightmasterSecurityExtensionBundle package.
  *
  * (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  *
@@ -9,16 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Fightmaster\Security\Handler;
+namespace Fightmaster\SecurityExtensionBundle\Security\Handler;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Fightmaster\Security\Handler\Exception\InvalidArgumentException;
-use Fightmaster\Security\Handler\Exception\ObjectClassNameNotFoundException;
+use Fightmaster\SecurityExtensionBundle\Security\Handler\Exception\InvalidArgumentException;
+use Fightmaster\SecurityExtensionBundle\Security\Handler\Exception\ObjectClassNameNotFoundException;
+use Fightmaster\SecurityExtensionBundle\Security\RoleInformationManagerInterface;
 
 /**
  * @author Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  */
-class AclRoleHandler implements HandlerInterface
+class AclRoleHandler extends AclHandlerAbstract
 {
     /**
      * The current Security Context.
@@ -28,39 +29,16 @@ class AclRoleHandler implements HandlerInterface
     private $securityContext;
 
     /**
-     * @var array
-     */
-    private $roleInformation = array('create' => null, 'view' => null, 'edit' => null, 'delete' => null,
-                                     'undelete' => null, 'operator' => null, 'master' => null, 'owner' => null);
-
-    /**
      * Constructor.
      *
      * @param SecurityContextInterface $securityContext
-     * @param $roleInformation
-     */
-    public function __construct(SecurityContextInterface $securityContext, $roleInformation = array())
-    {
-        $this->securityContext   = $securityContext;
-        $this->setRoleInformation($roleInformation);
-    }
-
-    /**
-     * Sets he FQCN of the object
-     *
      * @param string $objectClassName
+     * @param RoleInformationManagerInterface $roleInformationManager
      */
-    public function setObjectClassName($objectClassName)
+    public function __construct(SecurityContextInterface $securityContext, $objectClassName, RoleInformationManagerInterface $roleInformationManager)
     {
-        $this->objectClassName = $objectClassName;
-    }
-
-    /**
-     * @param array $roleInformation
-     */
-    public function setRoleInformation(array $roleInformation)
-    {
-        $this->roleInformation = array_merge($this->roleInformation, $roleInformation);
+        parent::__construct($objectClassName, $roleInformationManager);
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -70,7 +48,7 @@ class AclRoleHandler implements HandlerInterface
      */
     public function canCreate()
     {
-        return $this->securityContext->isGranted($this->roleInformation['create']);
+        return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'create'));
     }
 
     /**
@@ -78,10 +56,14 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canView($object)
     {
-        return $this->securityContext->isGranted($this->roleInformation['view']);
+        if ($this->isExpectedObject($object)) {
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'view'));
+        }
     }
 
     /**
@@ -89,12 +71,13 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canEdit($object)
     {
         if ($this->isExpectedObject($object)) {
-            return $this->securityContext->isGranted($this->roleInformation['edit']);
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'edit'));
         }
     }
 
@@ -103,12 +86,13 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canDelete($object)
     {
         if ($this->isExpectedObject($object)) {
-            return $this->securityContext->isGranted($this->roleInformation['delete']);
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'delete'));
         }
     }
 
@@ -117,12 +101,13 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canUndelete($object)
     {
         if ($this->isExpectedObject($object)) {
-            return $this->securityContext->isGranted($this->roleInformation['undelete']);
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'undelete'));
         }
     }
 
@@ -131,12 +116,13 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function isOperator($object)
     {
         if ($this->isExpectedObject($object)) {
-            return $this->securityContext->isGranted($this->roleInformation['operator']);
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'operator'));
         }
     }
 
@@ -146,12 +132,13 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function isMaster($object)
     {
         if ($this->isExpectedObject($object)) {
-            return $this->securityContext->isGranted($this->roleInformation['master']);
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'master'));
         }
     }
 
@@ -161,12 +148,13 @@ class AclRoleHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function isOwner($object)
     {
         if ($this->isExpectedObject($object)) {
-            return $this->securityContext->isGranted($this->roleInformation['owner']);
+            return $this->securityContext->isGranted($this->roleInformationManager->getRoleByPrivilege($this->objectClassName, 'owner'));
         }
     }
 
@@ -185,7 +173,7 @@ class AclRoleHandler implements HandlerInterface
      *
      * @return void
      */
-    public function installFallbackAcl($roleInformation = array())
+    public function installFallbackAcl()
     {
 
     }
@@ -198,26 +186,5 @@ class AclRoleHandler implements HandlerInterface
     public function uninstallFallbackAcl()
     {
 
-    }
-
-    /**
-     * Checks object
-     *
-     * @param $object
-     * @throws Exception\ObjectClassNameNotFoundException
-     * @throws Exception\InvalidArgumentException
-     * @return bool
-     */
-    protected function isExpectedObject($object)
-    {
-        if ($this->objectClassName == null) {
-            throw new ObjectClassNameNotFoundException();
-        }
-        $className = $this->objectClassName;
-        if (!$object instanceof $className) {
-            throw new InvalidArgumentException();
-        }
-
-        return true;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Fightmaster/security-extension library.
+ * This file is part of the FightmasterSecurityExtensionBundle package.
  *
  * (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  *
@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Fightmaster\Security\Handler;
+namespace Fightmaster\SecurityExtensionBundle\Security\Handler;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
@@ -19,14 +19,14 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterfac
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Fightmaster\Security\Handler\Exception\InvalidArgumentException;
-use Fightmaster\Security\Handler\Exception\ObjectClassNameNotFoundException;
-use Fightmaster\Security\Handler\Exception\ObjectIdentityNotFoundException;
+use Fightmaster\SecurityExtensionBundle\Security\Handler\Exception\InvalidArgumentException;
+use Fightmaster\SecurityExtensionBundle\Security\Handler\Exception\ObjectClassNameNotFoundException;
+use Fightmaster\SecurityExtensionBundle\Security\RoleInformationManagerInterface;
 
 /**
  * @author Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
  */
-class AclSecurityHandler implements HandlerInterface
+class AclSecurityHandler extends AclHandlerAbstract
 {
     /**
      * Used to retrieve ObjectIdentity instances for objects.
@@ -50,13 +50,6 @@ class AclSecurityHandler implements HandlerInterface
     private $securityContext;
 
     /**
-     * The FQCN of the object.
-     *
-     * @var string
-     */
-    private $objectClassName;
-
-    /**
      * The Class OID for the object.
      *
      * @var ObjectIdentity
@@ -67,11 +60,14 @@ class AclSecurityHandler implements HandlerInterface
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
      * @param \Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface $objectRetrieval
      * @param \Symfony\Component\Security\Acl\Model\MutableAclProviderInterface $aclProvider
+     * @param string $objectClassName
      */
     public function __construct(SecurityContextInterface $securityContext,
                                 ObjectIdentityRetrievalStrategyInterface $objectRetrieval,
-                                MutableAclProviderInterface $aclProvider)
+                                MutableAclProviderInterface $aclProvider, $objectClassName,
+                                RoleInformationManagerInterface $roleInformationManager)
     {
+        parent::__construct($objectClassName, $roleInformationManager);
         $this->securityContext   = $securityContext;
         $this->objectRetrieval   = $objectRetrieval;
         $this->aclProvider       = $aclProvider;
@@ -107,7 +103,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canView($object)
     {
@@ -121,7 +118,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canEdit($object)
     {
@@ -135,7 +133,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canDelete($object)
     {
@@ -149,7 +148,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function canUndelete($object)
     {
@@ -163,7 +163,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function isOperator($object)
     {
@@ -178,7 +179,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function isMaster($object)
     {
@@ -193,7 +195,8 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return boolean
-     * @throws Exception\InvalidArgumentException
+     * @throws ObjectClassNameNotFoundException
+     * @throws InvalidArgumentException
      */
     public function isOwner($object)
     {
@@ -210,7 +213,7 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param $object
      * @return void
-     * @throws Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setDefaultAcl($object)
     {
@@ -231,11 +234,10 @@ class AclSecurityHandler implements HandlerInterface
      * Installs the Default 'fallback' Acl entries for generic access.
      * This needs to be re-run whenever the object changes or is subclassed.
      *
-     * @param array $roleInformation
-     * @throws Exception\ObjectClassNameNotFoundException
+     * @throws ObjectClassNameNotFoundException
      * @return void
      */
-    public function installFallbackAcl($roleInformation = array())
+    public function installFallbackAcl()
     {
         if ($this->objectClassName == null) {
             throw new ObjectClassNameNotFoundException();
@@ -248,7 +250,7 @@ class AclSecurityHandler implements HandlerInterface
             return;
         }
 
-        $this->doInstallFallbackAcl($acl, new MaskBuilder(), $roleInformation);
+        $this->doInstallFallbackAcl($acl, new MaskBuilder());
         $this->aclProvider->updateAcl($acl);
     }
 
@@ -258,7 +260,7 @@ class AclSecurityHandler implements HandlerInterface
      * This should be run when uninstalling the object in your project, or when
      * the Class Acl entry end up corrupted.
      *
-     * @throws Exception\ObjectClassNameNotFoundException
+     * @throws ObjectClassNameNotFoundException
      * @return void
      */
     public function uninstallFallbackAcl()
@@ -289,11 +291,11 @@ class AclSecurityHandler implements HandlerInterface
      *
      * @param AclInterface $acl
      * @param MaskBuilder $builder
-     * @param array $roleInformation
      * @return void
      */
-    protected function doInstallFallbackAcl(AclInterface $acl, MaskBuilder $builder, array $roleInformation)
+    protected function doInstallFallbackAcl(AclInterface $acl, MaskBuilder $builder)
     {
+        $roleInformation = $this->roleInformationManager->getPrivilegesBasedOnRoles($this->objectClassName);
         if (count($roleInformation)) {
             foreach ($roleInformation as $role => $permissions) {
                 foreach ($permissions as $permission) {
@@ -311,26 +313,5 @@ class AclSecurityHandler implements HandlerInterface
     protected function getDefaultAclMask()
     {
         return MaskBuilder::MASK_OWNER;
-    }
-
-    /**
-     * Checks object
-     *
-     * @param $object
-     * @throws Exception\ObjectClassNameNotFoundException
-     * @throws Exception\InvalidArgumentException
-     * @return bool
-     */
-    protected function isExpectedObject($object)
-    {
-        if ($this->objectClassName == null) {
-            throw new ObjectClassNameNotFoundException();
-        }
-        $className = $this->objectClassName;
-        if (!$object instanceof $className) {
-            throw new InvalidArgumentException();
-        }
-
-        return true;
     }
 }
