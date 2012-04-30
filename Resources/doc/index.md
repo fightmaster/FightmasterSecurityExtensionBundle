@@ -9,7 +9,7 @@ Installation
 If you use a deps file, you could add:
 
  <pre>
- [FightmasterPublicationBundle]
+ [FightmasterSecurityExtensionBundle]
      git=https://github.com/fightmaster/FightmasterSecurityExtensionBundle.git
      target=vendor/bundles/Fightmaster/SecurityExtensionBundle
  </pre>

@@ -14,7 +14,7 @@ namespace Fightmaster\SecurityExtensionBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class FightmasterPublicationBundle extends Bundle
+class FightmasterSecurityExtensionBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {

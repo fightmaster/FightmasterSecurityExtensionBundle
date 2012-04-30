@@ -34,13 +34,13 @@ abstract class AclHandlerAbstract implements HandlerInterface
     protected $roleInformationManager;
 
     /**
-     * @param string $objectClassName
      * @param RoleInformationManagerInterface $roleInformationManagerInterface
+     * @param string $objectClassName
      */
-    public function __construct($objectClassName, RoleInformationManagerInterface $roleInformationManagerInterface)
+    public function __construct(RoleInformationManagerInterface $roleInformationManagerInterface, $objectClassName)
     {
-        $this->objectClassName = $objectClassName;
         $this->roleInformationManager = $roleInformationManagerInterface;
+        $this->objectClassName = $objectClassName;
     }
 
     /**

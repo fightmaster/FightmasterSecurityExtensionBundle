@@ -57,31 +57,22 @@ class AclSecurityHandler extends AclHandlerAbstract
     private $oid;
 
     /**
-     * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
-     * @param \Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface $objectRetrieval
-     * @param \Symfony\Component\Security\Acl\Model\MutableAclProviderInterface $aclProvider
+     * @param SecurityContextInterface $securityContext
+     * @param ObjectIdentityRetrievalStrategyInterface $objectRetrieval
+     * @param MutableAclProviderInterface $aclProvider
+     * @param RoleInformationManagerInterface $roleInformationManager
      * @param string $objectClassName
      */
     public function __construct(SecurityContextInterface $securityContext,
                                 ObjectIdentityRetrievalStrategyInterface $objectRetrieval,
-                                MutableAclProviderInterface $aclProvider, $objectClassName,
-                                RoleInformationManagerInterface $roleInformationManager)
+                                MutableAclProviderInterface $aclProvider,
+                                RoleInformationManagerInterface $roleInformationManager, $objectClassName)
     {
-        parent::__construct($objectClassName, $roleInformationManager);
+        parent::__construct($roleInformationManager, $objectClassName);
         $this->securityContext   = $securityContext;
         $this->objectRetrieval   = $objectRetrieval;
         $this->aclProvider       = $aclProvider;
-    }
-
-    /**
-     * Sets he FQCN of the object and value of the ObjectIdentity
-     *
-     * @param string $objectClassName
-     */
-    public function setObjectClassName($objectClassName)
-    {
-        $this->objectClassName   = $objectClassName;
-        $this->oid               = new ObjectIdentity('class', $this->objectClassName);;
+        $this->oid = new ObjectIdentity('class', $this->objectClassName);
     }
 
     /**

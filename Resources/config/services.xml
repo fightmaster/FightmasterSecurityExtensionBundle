@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ This file is part of the FightmasterSecurityExtensionBundle package.
+
+ (c) Dmitry Petrov aka fightmaster <old.fightmaster@gmail.com>
+
+ This source file is subject to the MIT license that is bundled
+ with this source code in the file LICENSE.
+-->
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="fightmaster_security_extension.manager.role_information.default.class">Fightmaster\SecurityExtensionBundle\Security\RoleInformationManager</parameter>
+        <parameter key="fightmaster_security_extension.manager.handler.role.class">Fightmaster\SecurityExtensionBundle\Security\Handler\AclRoleHandler</parameter>
+        <parameter key="fightmaster_security_extension.manager.handler.security.class">Fightmaster\SecurityExtensionBundle\Security\Handler\AclSecurityHandler</parameter>
+    </parameters>
+
+    <services>
+        <service id="fightmaster_security_extension.manager.role_information.default" class="%fightmaster_security_extension.manager.role_information.default.class%">
+            <argument>%fightmaster_security_extension.by_privileges%</argument>
+            <argument>%fightmaster_security_extension.by_roles%</argument>
+        </service>
+    </services>
+
+</container>

@@ -32,12 +32,12 @@ class AclRoleHandler extends AclHandlerAbstract
      * Constructor.
      *
      * @param SecurityContextInterface $securityContext
-     * @param string $objectClassName
      * @param RoleInformationManagerInterface $roleInformationManager
+     * @param string $objectClassName
      */
-    public function __construct(SecurityContextInterface $securityContext, $objectClassName, RoleInformationManagerInterface $roleInformationManager)
+    public function __construct(SecurityContextInterface $securityContext, RoleInformationManagerInterface $roleInformationManager, $objectClassName)
     {
-        parent::__construct($objectClassName, $roleInformationManager);
+        parent::__construct($roleInformationManager, $objectClassName);
         $this->securityContext = $securityContext;
     }
 
