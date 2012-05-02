@@ -41,8 +41,12 @@ class FightmasterSecurityExtensionExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         /** @todo implementation checking following parameters*/
-        $config['by_privileges'] = $configs[0]['by_privileges'];
-        $config['by_roles'] = $configs[0]['by_roles'];
+        if (!empty($configs[0]['by_privileges'])) {
+            $config['by_privileges'] = $configs[0]['by_privileges'];
+        }
+        if (!empty($configs[0]['by_roles'])) {
+            $config['by_roles'] = $configs[0]['by_roles'];
+        }
         $container->setAlias('fightmaster_security_extension.manager.role_information', $config['role_information_manager']);
         $container->setParameter('fightmaster_security_extension.by_privileges', $config['by_privileges']);
         $container->setParameter('fightmaster_security_extension.by_roles', $config['by_roles']);
